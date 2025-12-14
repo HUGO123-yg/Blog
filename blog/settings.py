@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -56,6 +57,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -126,6 +128,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# Optional object storage (S3 compatible). Configure via env vars when used.
+OBJECT_STORAGE = {
+    'bucket': os.environ.get('OBJECT_STORAGE_BUCKET'),
+    'endpoint': os.environ.get('OBJECT_STORAGE_ENDPOINT'),
+    'access_key': os.environ.get('OBJECT_STORAGE_ACCESS_KEY'),
+    'secret_key': os.environ.get('OBJECT_STORAGE_SECRET_KEY'),
+    'region': os.environ.get('OBJECT_STORAGE_REGION'),
+    'public_domain': os.environ.get('OBJECT_STORAGE_PUBLIC_DOMAIN'),  # optional CDN/domain
+    'use_ssl': os.environ.get('OBJECT_STORAGE_USE_SSL', 'true').lower() != 'false',
+    'default_acl': os.environ.get('OBJECT_STORAGE_DEFAULT_ACL', 'public-read'),
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -147,9 +163,8 @@ REST_AUTH = {
 
 # allauth配置
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ['username', 'email']
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
-ACCOUNT_USERNAME_REQUIRED = True
 
 # REST Framework配置
 REST_FRAMEWORK = {
